@@ -47,5 +47,3 @@ spec:
             name: project-service
             port: 
               number: 80
-
-  

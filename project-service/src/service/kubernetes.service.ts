@@ -71,7 +71,8 @@ export async function createService(serviceName: string, pordName: string){
                     targetPort: 3000
                 }
             ],
-            type: "LoadBalancer"
+            // type: "LoadBalancer"
+            type: "ClusterIP"
         }
     };
 
