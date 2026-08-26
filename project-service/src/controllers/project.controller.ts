@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { createPod, createService } from "../service/kubernetes.service.js"
+import { createPod, createService, waitForPodReady } from "../service/kubernetes.service.js"
 import { v4 as uuidv4 } from "uuid";
 
 
