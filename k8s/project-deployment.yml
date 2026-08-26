@@ -48,7 +48,12 @@ spec:
           valueFrom:
             secretKeyRef:
               name:  database
-              key:  AUTH_DB
+              key:  PROJECT_DB
+        - name:  REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name:  redis
+              key:  REDIS_URL      
         - name:  ACCESS_TOKEN_EXPIRY
           value:  15m
         - name:  REFRESH_TOKEN_EXPIRY

@@ -50,29 +50,6 @@ export async function createPod(podName: string){
     console.log(response)
 }
 
-export async function waitForPodReady(podName: string, timeoutMs = 120000){
-    const deadline = Date.now() + timeoutMs;
-
-    while (Date.now() < deadline) {
-        const response = await k8sApi.readNamespacedPodStatus({
-            name: podName,
-            namespace: "default"
-        });
-
-        const isReady = response.status?.conditions?.some(
-            condition => condition.type === "Ready" && condition.status === "True"
-        );
-
-        if (isReady) {
-            return;
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-
-    throw new Error(`Timed out waiting for pod ${podName} to become ready`);
-}
-
 export async function createService(serviceName: string, pordName: string){
        
     const serviceManifest = {
@@ -107,4 +84,39 @@ export async function createService(serviceName: string, pordName: string){
 
     console.log("Service created successfully:");
     console.log(response);
+}
+
+/** True when the Kubernetes API rejected the request because the object is gone. */
+function isNotFound(error: unknown) {
+    return (error as { code?: number })?.code === 404
+}
+
+/**
+ * Deletes a preview pod, treating an already-deleted pod as success.
+ *
+ * @param podName Name of the pod in the `default` namespace.
+ */
+export async function deletePod(podName: string) {
+    try {
+        await k8sApi.deleteNamespacedPod({ namespace: "default", name: podName })
+        console.log(`Pod ${podName} deleted`)
+    } catch (error) {
+        if (isNotFound(error)) return
+        throw error
+    }
+}
+
+/**
+ * Deletes a preview service, treating an already-deleted service as success.
+ *
+ * @param serviceName Name of the service in the `default` namespace.
+ */
+export async function deleteService(serviceName: string) {
+    try {
+        await k8sApi.deleteNamespacedService({ namespace: "default", name: serviceName })
+        console.log(`Service ${serviceName} deleted`)
+    } catch (error) {
+        if (isNotFound(error)) return
+        throw error
+    }
 }
